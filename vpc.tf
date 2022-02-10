@@ -128,7 +128,9 @@ resource "aws_codedeploy_app" "this" {
 
   name             = var.app_name
   compute_platform = "Lambda"
-  tags             = var.tags
+  tags = merge(var.tags, {
+    yor_trace = "fdd69288-bfcd-40ae-b73c-871ac27a50db"
+  })
 }
 
 resource "aws_codedeploy_deployment_group" "this" {
@@ -169,13 +171,18 @@ resource "aws_codedeploy_deployment_group" "this" {
     }
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    yor_trace = "0279b85b-2995-49db-8dea-65ac55e5bb94"
+  })
 }
 
 data "aws_iam_role" "codedeploy" {
   count = var.create && !var.create_codedeploy_role ? 1 : 0
 
   name = var.codedeploy_role_name
+  tags = {
+    yor_trace = "97f5770b-f872-432e-9ba0-711facdd0688"
+  }
 }
 
 resource "aws_iam_role" "codedeploy" {
@@ -183,7 +190,9 @@ resource "aws_iam_role" "codedeploy" {
 
   name               = coalesce(var.codedeploy_role_name, "${local.app_name}-codedeploy")
   assume_role_policy = data.aws_iam_policy_document.assume_role[0].json
-  tags               = var.tags
+  tags = merge(var.tags, {
+    yor_trace = "97f5770b-f872-432e-9ba0-711facdd0688"
+  })
 }
 
 
@@ -227,7 +236,9 @@ resource "aws_iam_policy" "hooks" {
   count = var.create && var.create_codedeploy_role && var.attach_hooks_policy && (var.before_allow_traffic_hook_arn != "" || var.after_allow_traffic_hook_arn != "") ? 1 : 0
 
   policy = data.aws_iam_policy_document.hooks[0].json
-  tags   = var.tags
+  tags = merge(var.tags, {
+    yor_trace = "889c931d-3be4-446e-949e-8d38568132a6"
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "hooks" {
@@ -255,7 +266,9 @@ resource "aws_iam_policy" "triggers" {
   count = var.create && var.create_codedeploy_role && var.attach_triggers_policy ? 1 : 0
 
   policy = data.aws_iam_policy_document.triggers[0].json
-  tags   = var.tags
+  tags = merge(var.tags, {
+    yor_trace = "48518628-36ab-4e7a-a0af-c863650bd7d8"
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "triggers" {
